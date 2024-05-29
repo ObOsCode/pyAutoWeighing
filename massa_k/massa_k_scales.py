@@ -1,29 +1,9 @@
 import socket
-import time
 from threading import Thread
-
 from datetime import datetime
-from openpyxl import Workbook
+from typing import Callable
 
-
-class WeightManager(Thread):
-
-    SEND_INTERVAL = 0.1  # seconds
-
-    def __init__(self, host, port):
-        super().__init__()
-        self.__is_started = False
-        self._scales = MassaKScales(host, port)
-        self._scales.start()
-
-    def run(self) -> None:
-        self.__is_started = True
-        while self.__is_started:
-            self._scales.send_command()
-            time.sleep(self.SEND_INTERVAL)
-
-    def stop(self):
-        self.__is_started = False
+from pyrobotics.event import Event
 
 
 class MassaKScales(Thread):
@@ -35,20 +15,19 @@ class MassaKScales(Thread):
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__socket.connect((host, port))
         self.__is_started = False
+        self.__weightingEvent = Event()
 
     def send_command(self) -> None:
         # print("send command!!!!")
         self.__socket.send(self.SCALES_INFO_COMMAND)
 
+    def add_weight_event_handler(self, handler: Callable):
+        self.__weightingEvent.handle(handler)
+
     def run(self) -> None:
         self.__is_started = True
         is_weight_now = False
         # prev_mass = 0  # prev weighted mass
-
-        workbook = Workbook()
-        sheet = workbook.active
-        sheet.append(["ID записи", "Время", "Масса"])
-        id_record = 1  # Инициализируем ID записи
 
         while self.__is_started:
 
@@ -76,14 +55,8 @@ class MassaKScales(Thread):
                 mass = -mass
 
             if is_weight_now and is_finished and (not is_zero):
-                print("==============================================")
-                print("Mass: ", mass)
                 is_weight_now = False
-
-                current_time = datetime.now().strftime('%H:%M:%S')
-                sheet.append([id_record, current_time, float(mass)])
-                id_record += 1
-                workbook.save('data/data.xlsx')
+                self.__weightingEvent.fire(mass)  # dispatch event
 
             if not is_finished:
                 is_weight_now = True

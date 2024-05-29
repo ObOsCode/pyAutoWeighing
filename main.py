@@ -1,6 +1,6 @@
 import sys
 
-from massa_k.massa_k_scales import WeightManager
+from massa_k.weight_manager import WeightManager
 
 
 def exception_hook(exctype, value, traceback):
