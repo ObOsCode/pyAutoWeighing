@@ -2,10 +2,13 @@ import socket
 import time
 from threading import Thread
 
+from datetime import datetime
+from openpyxl import Workbook
+
 
 class WeightManager(Thread):
 
-    SEND_INTERVAL = 5200
+    SEND_INTERVAL = 0.1  # seconds
 
     def __init__(self, host, port):
         super().__init__()
@@ -25,6 +28,8 @@ class WeightManager(Thread):
 
 class MassaKScales(Thread):
 
+    SCALES_INFO_COMMAND = b'\x4A'
+
     def __init__(self, host, port):
         super().__init__()
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,17 +37,57 @@ class MassaKScales(Thread):
         self.__is_started = False
 
     def send_command(self) -> None:
-        print("send command!!!!")
-        self.__socket.send(b'\x4A')
+        # print("send command!!!!")
+        self.__socket.send(self.SCALES_INFO_COMMAND)
 
     def run(self) -> None:
         self.__is_started = True
-        print("START")
+        is_weight_now = False
+        # prev_mass = 0  # prev weighted mass
+
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.append(["ID записи", "Время", "Масса"])
+        id_record = 1  # Инициализируем ID записи
+
         while self.__is_started:
 
             data = self.__socket.recv(1024)
 
-            print(f"Received {data!r}")
+            is_minus = (data[4] >> 7) & 1
+            is_finished = (data[0] >> 7) & 1
+            is_zero = (data[0] >> 6) & 1
+            # is_net = (data[0] >> 5) & 1
+
+            mass = 0
+            mass |= (data[4] & 0b1111111) << 16
+            mass |= data[3] << 8
+            mass |= data[2]
+
+            discreteness = data[1]  # 0 - в граммах, 1 - в десятых грамма
+
+            if discreteness == 1:
+                mass /= 10
+            # elif discreteness == 4:
+            #     mass *= 10
+            # elif (discreteness == 5) or (discreteness == 6):
+            #     mass *= 100
+            if is_minus:
+                mass = -mass
+
+            if is_weight_now and is_finished and (not is_zero):
+                print("==============================================")
+                print("Mass: ", mass)
+                is_weight_now = False
+
+                current_time = datetime.now().strftime('%H:%M:%S')
+                sheet.append([id_record, current_time, float(mass)])
+                id_record += 1
+                workbook.save('data/data.xlsx')
+
+            if not is_finished:
+                is_weight_now = True
+
 
 '''
 unsigned short CRC16(unsigned short crc, unsigned char *buf, unsigned short len)

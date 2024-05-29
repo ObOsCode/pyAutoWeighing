@@ -1,8 +1,8 @@
 # my pycashe
 
 __pycache__/
-seeder/__pycache__/
-seeder/gui/__pycache__/
+massa_k/__pycache__/
+data
 
 .idea/
 .venv/
