@@ -26,7 +26,8 @@ if __name__ == "__main__":
     # Load config
     if not os.path.exists(CONFIG_PATH):
         print("Ошибка. Отсутствует конфигурационный файл", CONFIG_PATH)
-        exit(-100500)
+        input("Нажмите Enter чтобы закрыть окно")
+        # exit(-100500)
 
     # print("")
     # print("")
@@ -54,3 +55,5 @@ if __name__ == "__main__":
 
     # Управление взвешиванием
     weight_manager = WeightManager(host, port, DATA_FOLDER_PATH)
+
+    input("Нажмите Enter чтобы закрыть окно")

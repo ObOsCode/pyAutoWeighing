@@ -23,6 +23,10 @@ class MassaKScales(Thread):
             self.__socket.connect((host, port))
         except TimeoutError:
             print("TimeoutError")
+        except ConnectionRefusedError:
+            print("TimeoutError")
+        except Exception:
+            print("Connection error")
         else:
             self.is_connected = True
 
