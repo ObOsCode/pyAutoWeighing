@@ -3,6 +3,7 @@
 __pycache__/
 massa_k/__pycache__/
 data
+bin
 
 .idea/
 .venv/
