@@ -18,4 +18,4 @@ if __name__ == "__main__":
     PORT = 5001  # The port
 
     weight_manager = WeightManager(HOST, PORT)
-    weight_manager.start()
+    # weight_manager.start()

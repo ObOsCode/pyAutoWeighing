@@ -12,10 +12,19 @@ class MassaKScales(Thread):
 
     def __init__(self, host, port):
         super().__init__()
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__socket.connect((host, port))
+
+        self.is_connected = False
         self.__is_started = False
         self.__weightingEvent = Event()
+
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        try:
+            self.__socket.connect((host, port))
+        except TimeoutError:
+            print("TimeoutError")
+        else:
+            self.is_connected = True
 
     def send_command(self) -> None:
         # print("send command!!!!")
