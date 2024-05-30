@@ -12,17 +12,17 @@ from openpyxl import Workbook
 class WeightManager(Thread):
 
     SEND_INTERVAL = 0.1  # seconds
-    DATA_FOLDER_PATH = './data/'
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, data_folder_path):
         super().__init__()
+        self.__data_folder_path = data_folder_path
         self.__is_started = False
         self.__cur_file_path = ''
         self.__workbook = None
         self.__sheet = None
         self.__next_id = 0
 
-        print("Подключение к ", host, "...")
+        print("Подключение к весам ", host, "(port", port, ")...")
         self._scales = MassaKScales(host, port)
         if self._scales.is_connected:
             print("Подключено!")
@@ -36,12 +36,13 @@ class WeightManager(Thread):
 
     def check_change_day(self):
         # Create data folder if not exist
-        if not os.path.exists(self.DATA_FOLDER_PATH):
-            os.makedirs(self.DATA_FOLDER_PATH)
+        if not os.path.exists(self.__data_folder_path):
+            os.makedirs(self.__data_folder_path)
 
         cur_date_time_str = datetime.now().strftime('%d-%m-%Y')
         # cur_date_time_str = datetime.now().strftime('%d-%m-%Y_%H-%M')
-        new_file_path = self.DATA_FOLDER_PATH + cur_date_time_str + '.xlsx'
+        # new_file_path = self.DATA_FOLDER_PATH + cur_date_time_str + '.xlsx'
+        new_file_path = os.path.join(self.__data_folder_path, cur_date_time_str + '.xlsx')
 
         if self.__cur_file_path != new_file_path:
             if self.__workbook is not None:
