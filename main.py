@@ -52,8 +52,11 @@ if __name__ == "__main__":
     config.read(CONFIG_PATH)
     host = config.get("Network", "ip")  # IP address
     port = int(config.get("Network", "port"))  # The port
+    data_folder_path = (config.get("Path", "data_folder_path"))  # The port
+
+    print("Папка с данными взвешивания:", data_folder_path)
 
     # Управление взвешиванием
-    weight_manager = WeightManager(host, port, DATA_FOLDER_PATH)
+    weight_manager = WeightManager(host, port, data_folder_path)
 
-    input("Нажмите Enter чтобы закрыть окно")
+    # input("Нажмите Enter чтобы закрыть окно")
