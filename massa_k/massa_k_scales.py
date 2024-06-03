@@ -1,6 +1,5 @@
 import socket
 from threading import Thread
-from datetime import datetime
 from typing import Callable
 
 from pyrobotics.event import Event

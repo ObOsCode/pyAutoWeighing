@@ -7,9 +7,8 @@ from massa_k.weight_manager import WeightManager
 
 ROOT_PATH = os.path.dirname(sys.modules['__main__'].__file__)
 CONFIG_PATH = os.path.join(ROOT_PATH, "bin", "config.ini")
-DATA_FOLDER_PATH = os.path.join(ROOT_PATH, "bin", "data")
 
-VERSION = '0.1'
+VERSION = '0.2'
 
 
 def exception_hook(exctype, value, traceback):
