@@ -10,29 +10,31 @@ class MassaKScales(Thread):
 
     SCALES_INFO_COMMAND = b'\x4A'
 
-    def __init__(self, host, port):
+    def __init__(self):
         super().__init__()
-
+        self.__socket = None
+        self.__weightingEvent = Event()
         self.is_connected = False
         self.__is_started = False
-        self.__weightingEvent = Event()
 
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+    def connect(self, host, port):
         try:
+            self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.__socket.connect((host, port))
         except TimeoutError:
-            print("TimeoutError")
-        except ConnectionRefusedError:
-            print("TimeoutError")
-        except Exception:
-            print("Connection error")
+            print("Socket connection TimeoutError!")
+        except ConnectionError:
+            print("Socket connection error!")
         else:
             self.is_connected = True
 
     def send_command(self) -> None:
-        # print("send command!!!!")
-        self.__socket.send(self.SCALES_INFO_COMMAND)
+        try:
+            self.__socket.send(self.SCALES_INFO_COMMAND)
+        except ConnectionError:
+            print("Socket send error!")
+            self.is_connected = False
+            self.__socket.close()
 
     def add_weight_event_handler(self, handler: Callable):
         self.__weightingEvent.handle(handler)
@@ -40,11 +42,24 @@ class MassaKScales(Thread):
     def run(self) -> None:
         self.__is_started = True
         is_weight_now = False
-        # prev_mass = 0  # prev weighted mass
 
         while self.__is_started:
 
-            data = self.__socket.recv(1024)
+            if not self.is_connected:
+                continue
+
+            try:
+                data = self.__socket.recv(1024)
+            except ConnectionError:
+                print("Socket receive error!")
+                self.is_connected = False
+                self.__socket.close()
+                continue
+            except TimeoutError:
+                print("Socket receive timeout error!")
+                self.is_connected = False
+                self.__socket.close()
+                continue
 
             is_minus = (data[4] >> 7) & 1
             is_finished = (data[0] >> 7) & 1

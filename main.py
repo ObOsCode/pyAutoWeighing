@@ -58,5 +58,6 @@ if __name__ == "__main__":
 
     # Управление взвешиванием
     weight_manager = WeightManager(host, port, data_folder_path)
+    weight_manager.start()
 
     # input("Нажмите Enter чтобы закрыть окно")

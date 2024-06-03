@@ -15,6 +15,8 @@ class WeightManager(Thread):
 
     def __init__(self, host, port, data_folder_path):
         super().__init__()
+        self.__host = host
+        self.__port = port
         self.__data_folder_path = data_folder_path
         self.__is_started = False
         self.__cur_file_path = ''
@@ -22,15 +24,8 @@ class WeightManager(Thread):
         self.__sheet = None
         self.__next_id = 0
 
-        print("Подключение к весам ", host, "(port", port, ")...")
-        self._scales = MassaKScales(host, port)
-        if self._scales.is_connected:
-            print("Подключено!")
-            self._scales.add_weight_event_handler(self.weight_event_handler)
-            self._scales.start()
-            self.start()
-        else:
-            print("Ошибка соединения с весами! IP: ", host, " , port: ", port)
+        self._scales = MassaKScales()
+        self._scales.start()
 
         self.check_change_day()
 
@@ -40,8 +35,6 @@ class WeightManager(Thread):
             os.makedirs(self.__data_folder_path)
 
         cur_date_time_str = datetime.now().strftime('%d-%m-%Y')
-        # cur_date_time_str = datetime.now().strftime('%d-%m-%Y_%H-%M')
-        # new_file_path = self.DATA_FOLDER_PATH + cur_date_time_str + '.xlsx'
         new_file_path = os.path.join(self.__data_folder_path, cur_date_time_str + '.xlsx')
 
         if self.__cur_file_path != new_file_path:
@@ -69,10 +62,25 @@ class WeightManager(Thread):
         print(current_time_str, " Масса:", mass, "г.")
 
     def run(self) -> None:
+
         self.__is_started = True
+
         while self.__is_started:
-            self._scales.send_command()
-            time.sleep(self.SEND_INTERVAL)
+
+            if not self._scales.is_connected:
+
+                print("Подключение к весам ", self.__host, "(port", self.__port, ")...")
+                self._scales.connect(self.__host, self.__port)
+
+                if self._scales.is_connected:
+                    print("Подключено!")
+                    self._scales.add_weight_event_handler(self.weight_event_handler)
+                    # self._scales.start()
+                else:
+                    print("Ошибка соединения с весами! IP: ", self.__host, " , port: ", self.__port)
+            else:
+                self._scales.send_command()
+                time.sleep(self.SEND_INTERVAL)
 
     def stop(self):
         self.__is_started = False
