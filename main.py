@@ -1,14 +1,12 @@
 import os
 import sys
-
 from configparser import ConfigParser
-
 from massa_k.weight_manager import WeightManager
 
 ROOT_PATH = os.path.dirname(sys.modules['__main__'].__file__)
 CONFIG_PATH = os.path.join(ROOT_PATH, "bin", "config.ini")
 
-VERSION = '0.2'
+VERSION = '0.2.1'
 
 
 def exception_hook(exctype, value, traceback):
@@ -26,25 +24,13 @@ if __name__ == "__main__":
     if not os.path.exists(CONFIG_PATH):
         print("Ошибка. Отсутствует конфигурационный файл", CONFIG_PATH)
         input("Нажмите Enter чтобы закрыть окно")
-        # exit(-100500)
-
-    # print("")
-    # print("")
-    # print('         ／＞　 フ')
-    # print('　　　　　| 　_　 _|')
-    # print('　 　　　／`ミ _x 彡')
-    # print('　　 　 /　　　 　 |')
-    # print('　　　 /　 ヽ　　 ﾉ')
-    # print('  ／￣|　　 |　|　|')
-    # print('　| (￣ヽ＿_ヽ_)_)')н
-    # print('　＼二つ')
 
     print("")
     print("***********************************************************")
     print("******* Сбор и архивирование данных с весов Масса-К *******")
     print("***********************************************************")
+    print("v", VERSION, sep="")
     print("")
-
     print("Загрузка настроек", CONFIG_PATH, "...")
 
     config = ConfigParser()

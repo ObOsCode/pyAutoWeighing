@@ -60,6 +60,18 @@ class MassaKScales(Thread):
                 self.__socket.close()
                 continue
 
+            except OSError as err:
+                print("OSError!", err)
+                self.is_connected = False
+                self.__socket.close()
+                continue
+
+            except Exception as err:
+                print(f"Unexpected {err=}, {type(err)=}")
+                self.is_connected = False
+                self.__socket.close()
+                continue
+
             is_minus = (data[4] >> 7) & 1
             is_finished = (data[0] >> 7) & 1
             is_zero = (data[0] >> 6) & 1
