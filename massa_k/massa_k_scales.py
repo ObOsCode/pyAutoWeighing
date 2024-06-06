@@ -24,6 +24,11 @@ class MassaKScales(Thread):
             print("Socket connection TimeoutError!")
         except ConnectionError:
             print("Socket connection error!")
+        except OSError as err:
+            print("Socket connection OSError!", err)
+        except Exception as err:
+            print(f"Socket connection Unexpected error {err=}, {type(err)=}")
+
         else:
             self.is_connected = True
 
