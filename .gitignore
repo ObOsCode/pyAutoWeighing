@@ -1,12 +1,14 @@
+#
+.idea/
+.venv/
+pyRobotics/
+
 # my pycashe
 
 __pycache__/
 massa_k/__pycache__/
 data
 bin
-
-.idea/
-.venv/
 
 # Pycache
  *.pyc
