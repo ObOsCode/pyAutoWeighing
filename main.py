@@ -39,10 +39,12 @@ if __name__ == "__main__":
     port = int(config.get("Network", "port"))  # The port
     data_folder_path = (config.get("Path", "data_folder_path"))  # The port
 
+    min_mass = float(config.get("Weighing", "min_mass"))
+
     print("Папка с данными взвешивания:", data_folder_path)
 
     # Управление взвешиванием
-    weight_manager = WeightManager(host, port, data_folder_path)
+    weight_manager = WeightManager(host, port, data_folder_path, min_mass)
     weight_manager.start()
 
     # input("Нажмите Enter чтобы закрыть окно")

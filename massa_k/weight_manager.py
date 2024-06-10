@@ -13,11 +13,12 @@ class WeightManager(Thread):
 
     SEND_INTERVAL = 0.1  # seconds
 
-    def __init__(self, host, port, data_folder_path):
+    def __init__(self, host, port, data_folder_path, min_mass):
         super().__init__()
         self.__host = host
         self.__port = port
         self.__data_folder_path = data_folder_path
+        self.__min_mass = min_mass
         self.__is_started = False
         self.__cur_file_path = ''
         self.__workbook = None
@@ -53,6 +54,8 @@ class WeightManager(Thread):
                 self.__next_id = 1
 
     def weight_event_handler(self, mass):
+        if mass < self.__min_mass:
+            return
         self.check_change_day()
         current_time_str = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         self.__sheet.append([self.__next_id, current_time_str, float(mass)])
