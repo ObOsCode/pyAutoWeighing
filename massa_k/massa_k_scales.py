@@ -26,6 +26,10 @@ class MassaKScales(Thread):
             print("Socket connection error!")
         except OSError as err:
             print("Socket connection OSError!", err)
+
+        except SystemError:
+            print("System error!")
+
         except Exception as err:
             print(f"Socket connection Unexpected error {err=}, {type(err)=}")
 
@@ -67,6 +71,12 @@ class MassaKScales(Thread):
 
             except OSError as err:
                 print("OSError!", err)
+                self.is_connected = False
+                self.__socket.close()
+                continue
+
+            except SystemError:
+                print("System error!")
                 self.is_connected = False
                 self.__socket.close()
                 continue
