@@ -32,11 +32,16 @@ class WeightManager(Thread):
 
     def check_change_day(self):
         # Create data folder if not exist
-        if not os.path.exists(self.__data_folder_path):
-            os.makedirs(self.__data_folder_path)
+        # if not os.path.exists(self.__data_folder_path):
+        #     os.makedirs(self.__data_folder_path)
+        cur_date_data_folder_path = os.path.join(self.__data_folder_path, datetime.now().strftime('%m-%Y'))
+        if not os.path.exists(cur_date_data_folder_path):
+            os.makedirs(cur_date_data_folder_path)
 
+        # cur_date_str = datetime.now().strftime('%m-%Y')
+        # new_file_path = os.path.join(self.__data_folder_path, cur_date_time_str + '.xlsx')
         cur_date_time_str = datetime.now().strftime('%d-%m-%Y')
-        new_file_path = os.path.join(self.__data_folder_path, cur_date_time_str + '.xlsx')
+        new_file_path = os.path.join(cur_date_data_folder_path, cur_date_time_str + '.xlsx')
 
         if self.__cur_file_path != new_file_path:
             if self.__workbook is not None:
