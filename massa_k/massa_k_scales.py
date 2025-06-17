@@ -42,8 +42,12 @@ class MassaKScales(Thread):
             self.is_connected = False
             self.__socket.close()
         except OSError as err:
+            self.is_connected = False
+            self.__socket.close()
             print("Socket connection OSError!", err)
         except Exception as err:
+            self.is_connected = False
+            self.__socket.close()
             print(f"Socket connection Unexpected error {err=}, {type(err)=}")
 
     def add_weight_event_handler(self, handler: Callable):
